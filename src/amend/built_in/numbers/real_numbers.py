@@ -180,7 +180,7 @@ def amend_real_number(
                 stacklevel=warning_stack_level,
             )
 
-    if not_a_number_value_action is not None and math.isinf(not_a_number_value_action):
+    if not_a_number_value_action is not None and math.isnan(real_number):
         message = f"Real number {real_number} isn't a number"
         if not_a_number_value_action == "error":
             raise ValueError(message)
