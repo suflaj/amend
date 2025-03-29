@@ -27,7 +27,7 @@ from amend.built_in.numbers.integers import amend_integer
 def _amend_data_mapping(
     data_mapping_type: Type[dict],
     data_mapping,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -45,14 +45,12 @@ def _amend_data_mapping(
 ) -> Dict[Any, Any]:
     if data_mapping_type not in (dict,):
         raise ValueError(f"Invalid data mapping type {repr(data_mapping_type)}")
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or (
@@ -80,7 +78,7 @@ def _amend_data_mapping(
     if minimum_length is not None:
         minimum_length = amend_integer(
             integer=minimum_length,
-            instance_mismatch_action="error",
+            type_mismatch_action="error",
             minimum_value=0,
             value_violation_action="error",
             warning_stack_level=warning_stack_level + 1,
@@ -88,7 +86,7 @@ def _amend_data_mapping(
     if maximum_length is not None:
         maximum_length = amend_integer(
             integer=maximum_length,
-            instance_mismatch_action="error",
+            type_mismatch_action="error",
             minimum_value=0,
             value_violation_action="error",
             warning_stack_level=warning_stack_level + 1,
@@ -106,11 +104,11 @@ def _amend_data_mapping(
         data_mapping,
         data_mapping_type,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(data_mapping)} isn't a {data_mapping_type}"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,
@@ -165,7 +163,7 @@ def _amend_data_mapping(
 
 def amend_mutable_data_mapping(
     mutable_data_mapping,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -192,7 +190,7 @@ def amend_mutable_data_mapping(
     return _amend_data_mapping(
         data_mapping_type=dict,
         data_mapping=mutable_data_mapping,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_length=minimum_length,
         maximum_length=maximum_length,

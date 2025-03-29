@@ -32,7 +32,7 @@ from amend.utilities.normalization import (
 def _amend_sequence_container(
     sequence_container_type: Type[list] | Type[tuple],
     sequence_container,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -67,14 +67,12 @@ def _amend_sequence_container(
         raise ValueError(
             f"Invalid sequence container type {repr(sequence_container_type)}"
         )
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or isinstance(
@@ -104,12 +102,12 @@ def _amend_sequence_container(
             sequence_container,
             sequence_container_type,
         )
-        and instance_mismatch_action is not None
+        and type_mismatch_action is not None
     ):
         message = f"Entity {repr(sequence_container)} isn't {sequence_container_type}"
-        if instance_mismatch_action == "error":
+        if type_mismatch_action == "error":
             raise TypeError(message)
-        elif instance_mismatch_action == "warning":
+        elif type_mismatch_action == "warning":
             warnings.warn(
                 message,
                 UserWarning,
@@ -182,7 +180,7 @@ def _amend_sequence_container(
 
 def amend_immutable_sequence(
     immutable_sequence,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -222,7 +220,7 @@ def amend_immutable_sequence(
         _amend_sequence_container(
             sequence_container_type=tuple,
             sequence_container=immutable_sequence,
-            instance_mismatch_action=instance_mismatch_action,
+            type_mismatch_action=type_mismatch_action,
             value_on_cast_error=value_on_cast_error,
             minimum_length=minimum_length,
             maximum_length=maximum_length,
@@ -238,7 +236,7 @@ def amend_immutable_sequence(
 
 def amend_mutable_sequence(
     mutable_sequence,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -278,7 +276,7 @@ def amend_mutable_sequence(
         _amend_sequence_container(
             sequence_container_type=tuple,
             sequence_container=mutable_sequence,
-            instance_mismatch_action=instance_mismatch_action,
+            type_mismatch_action=type_mismatch_action,
             value_on_cast_error=value_on_cast_error,
             minimum_length=minimum_length,
             maximum_length=maximum_length,

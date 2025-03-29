@@ -29,7 +29,7 @@ from amend.utilities.normalization import (
 def _amend_data_sequence(
     data_sequence_type: Type[bytearray] | Type[bytes] | Type[str],
     data_sequence,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -63,14 +63,12 @@ def _amend_data_sequence(
         str,
     ):
         raise ValueError(f"Invalid data sequence type {repr(data_sequence_type)}")
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or (
@@ -113,11 +111,11 @@ def _amend_data_sequence(
         data_sequence,
         data_sequence_type,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(data_sequence)} isn't {data_sequence_type}"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,
@@ -182,7 +180,7 @@ def _amend_data_sequence(
 
 def amend_immutable_binary(
     immutable_binary,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -221,7 +219,7 @@ def amend_immutable_binary(
     return _amend_data_sequence(
         data_sequence_type=bytes,
         data_sequence=immutable_binary,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_length=minimum_length,
         maximum_length=maximum_length,
@@ -236,7 +234,7 @@ def amend_immutable_binary(
 
 def amend_mutable_binary(
     mutable_binary,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -275,7 +273,7 @@ def amend_mutable_binary(
     return _amend_data_sequence(
         data_sequence_type=bytearray,
         data_sequence=mutable_binary,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_length=minimum_length,
         maximum_length=maximum_length,
@@ -290,7 +288,7 @@ def amend_mutable_binary(
 
 def amend_text(
     text,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -329,7 +327,7 @@ def amend_text(
     return _amend_data_sequence(
         data_sequence_type=str,
         data_sequence=text,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_length=minimum_length,
         maximum_length=maximum_length,

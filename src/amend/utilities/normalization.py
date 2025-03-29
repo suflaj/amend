@@ -48,7 +48,7 @@ def find_least_common_multiplier(
     multiples = tuple(
         amend_integer(
             multiple,
-            instance_mismatch_action="warning",
+            type_mismatch_action="warning",
             minimum_value=1,
             value_violation_action="error",
             warning_stack_level=warning_stack_level,
@@ -81,7 +81,7 @@ def iterate_over_lengths_satisfying_constraints(
 ]:
     length = amend_integer(
         length,
-        instance_mismatch_action="error",
+        type_mismatch_action="error",
         minimum_value=0,
         value_violation_action="error",
         warning_stack_level=3,
@@ -102,7 +102,7 @@ def iterate_over_lengths_satisfying_constraints(
     if maximum_length is not None:
         maximum_length = amend_integer(
             maximum_length,
-            instance_mismatch_action="warning",
+            type_mismatch_action="warning",
             minimum_value=0,
             value_violation_action="clamp",
             warning_stack_level=warning_stack_level + 1,
@@ -277,7 +277,7 @@ def _normalize_length_of_data_sequence(
         proposed_length_change = tuple(
             amend_integer(
                 integer=length_change,
-                instance_mismatch_action="warning",
+                type_mismatch_action="warning",
                 warning_stack_level=warning_stack_level + 1,
             )
             for length_change in proposed_length_change
@@ -449,7 +449,7 @@ def _normalize_length_of_sequence_container(
         proposed_length_change = tuple(
             amend_integer(
                 integer=length_change,
-                instance_mismatch_action="warning",
+                type_mismatch_action="warning",
                 warning_stack_level=warning_stack_level + 1,
             )
             for length_change in proposed_length_change

@@ -18,7 +18,7 @@ import warnings
 
 def amend_integer(
     integer,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -32,14 +32,12 @@ def amend_integer(
     ] = None,
     warning_stack_level: int = None,
 ) -> int:
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or isinstance(
@@ -83,11 +81,11 @@ def amend_integer(
         integer,
         int,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(integer)} isn't an int"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,

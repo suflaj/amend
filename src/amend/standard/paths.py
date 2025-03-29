@@ -21,7 +21,7 @@ from amend.built_in.numbers.integers import amend_integer
 
 def amend_directory(
     directory,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -38,14 +38,12 @@ def amend_directory(
     ] = None,
     warning_stack_level: int = None,
 ) -> Path:
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or (
@@ -86,11 +84,11 @@ def amend_directory(
         directory,
         Path,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(directory)} isn't a pathlib.Path"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,
@@ -154,7 +152,7 @@ def amend_directory(
 
 def amend_file(
     file,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -171,14 +169,12 @@ def amend_file(
     ] = None,
     warning_stack_level: int = None,
 ) -> Path:
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or (
@@ -219,12 +215,12 @@ def amend_file(
             file,
             Path,
         )
-        and instance_mismatch_action is not None
+        and type_mismatch_action is not None
     ):
         message = f"Entity {repr(file)} isn't a pathlib.Path"
-        if instance_mismatch_action == "error":
+        if type_mismatch_action == "error":
             raise TypeError(message)
-        elif instance_mismatch_action == "warning":
+        elif type_mismatch_action == "warning":
             warnings.warn(
                 message,
                 UserWarning,

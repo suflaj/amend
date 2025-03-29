@@ -30,7 +30,7 @@ def _amend_temporal_value(
         | Type[datetime.timedelta]
     ),
     temporal_value,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -57,14 +57,12 @@ def _amend_temporal_value(
         datetime.timedelta,
     ):
         raise ValueError(f"Invalid temporal value type {repr(temporal_value_type)}")
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or isinstance(
@@ -110,11 +108,11 @@ def _amend_temporal_value(
         temporal_value,
         temporal_value_type,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(temporal_value)} isn't a {temporal_value_type}"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,
@@ -162,7 +160,7 @@ def _amend_temporal_value(
 
 def amend_date(
     date,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -187,7 +185,7 @@ def amend_date(
     return _amend_temporal_value(
         temporal_value_type=datetime.date,
         temporal_value=date,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_value=minimum_value,
         maximum_value=maximum_value,
@@ -198,7 +196,7 @@ def amend_date(
 
 def amend_date_and_time(
     date_and_time,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -223,7 +221,7 @@ def amend_date_and_time(
     return _amend_temporal_value(
         temporal_value_type=datetime.datetime,
         temporal_value=date_and_time,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_value=minimum_value,
         maximum_value=maximum_value,
@@ -234,7 +232,7 @@ def amend_date_and_time(
 
 def amend_time(
     time,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -259,7 +257,7 @@ def amend_time(
     return _amend_temporal_value(
         temporal_value_type=datetime.time,
         temporal_value=time,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_value=minimum_value,
         maximum_value=maximum_value,
@@ -270,7 +268,7 @@ def amend_time(
 
 def amend_temporal_offset(
     temporal_offset,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -295,7 +293,7 @@ def amend_temporal_offset(
     return _amend_temporal_value(
         temporal_value_type=datetime.timedelta,
         temporal_value=temporal_offset,
-        instance_mismatch_action=instance_mismatch_action,
+        type_mismatch_action=type_mismatch_action,
         value_on_cast_error=value_on_cast_error,
         minimum_value=minimum_value,
         maximum_value=maximum_value,

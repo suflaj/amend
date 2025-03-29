@@ -21,7 +21,7 @@ from amend.built_in.numbers.integers import amend_integer
 
 def amend_real_number(
     real_number,
-    instance_mismatch_action: Literal[
+    type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
@@ -44,14 +44,12 @@ def amend_real_number(
     number_of_rounding_decimals: int = None,
     warning_stack_level: int = None,
 ) -> int:
-    if instance_mismatch_action not in (
+    if type_mismatch_action not in (
         None,
         "error",
         "warning",
     ):
-        raise ValueError(
-            f"Invalid instance mismatch action {repr(instance_mismatch_action)}"
-        )
+        raise ValueError(f"Invalid type mismatch action {repr(type_mismatch_action)}")
     if not (
         value_on_cast_error is None
         or isinstance(
@@ -109,7 +107,7 @@ def amend_real_number(
     if number_of_rounding_decimals is not None:
         number_of_rounding_decimals = amend_integer(
             integer=number_of_rounding_decimals,
-            instance_mismatch_action="warning",
+            type_mismatch_action="warning",
             warning_stack_level=warning_stack_level + 1,
         )
 
@@ -117,11 +115,11 @@ def amend_real_number(
         real_number,
         float,
     ):
-        if instance_mismatch_action is not None:
+        if type_mismatch_action is not None:
             message = f"Entity {repr(real_number)} isn't a float"
-            if instance_mismatch_action == "error":
+            if type_mismatch_action == "error":
                 raise TypeError(message)
-            elif instance_mismatch_action == "warning":
+            elif type_mismatch_action == "warning":
                 warnings.warn(
                     message,
                     UserWarning,
