@@ -119,23 +119,30 @@ def iterate_over_lengths_satisfying_constraints(
     truncation_proposal = length - (length % differential)
     padding_proposal = length + differential - (length % differential)
 
+    new_truncation_proposal = truncation_proposal
+    new_padding_proposal = padding_proposal
     while True:
-        if minimum_length <= truncation_proposal and (
-            maximum_length is None or truncation_proposal <= maximum_length
-        ):
-            yield truncation_proposal - length
-            truncation_proposal = truncation_proposal - differential
+        if minimum_length <= truncation_proposal:
+            if maximum_length is None or truncation_proposal <= maximum_length:
+                yield truncation_proposal - length
+            new_truncation_proposal = truncation_proposal - differential
 
-        if minimum_length <= padding_proposal and (
-            maximum_length is None or padding_proposal <= maximum_length
-        ):
-            yield padding_proposal - length
-            padding_proposal = padding_proposal + differential
+        if maximum_length is None or padding_proposal <= maximum_length:
+            if minimum_length <= padding_proposal:
+                yield padding_proposal - length
+            new_padding_proposal = padding_proposal + differential
 
-        if truncation_proposal < minimum_length and (
-            maximum_length is not None and padding_proposal > maximum_length
+        if (
+            new_truncation_proposal == truncation_proposal
+            and new_padding_proposal == padding_proposal
+        ) or (
+            truncation_proposal < minimum_length
+            and (maximum_length is not None and padding_proposal > maximum_length)
         ):
             break
+
+        truncation_proposal = new_truncation_proposal
+        padding_proposal = new_padding_proposal
     return
 
 
@@ -198,6 +205,8 @@ def determine_length_normalization_strategy(
                 0,
                 0,
             )
+        elif truncation_side is None and padding_side is None:
+            return None
 
         side_to_look_at = (
             truncation_side if proposed_length_change < 0 else padding_side
@@ -215,7 +224,12 @@ def determine_length_normalization_strategy(
                 0,
                 proposed_length_change,
             )
-        elif side_to_look_at == "both-but-prioritize-left":
+        elif (
+            side_to_look_at == "both-but-prioritize-left" and proposed_length_change > 0
+        ) or (
+            side_to_look_at == "both-but-prioritize-right"
+            and proposed_length_change < 0
+        ):
             return (
                 (proposed_length_change + 1) // 2,
                 proposed_length_change // 2,
@@ -236,7 +250,7 @@ def _normalize_length_of_data_sequence(
         int,
         int,
     ] = None,
-    padding_value: bytearray | bytes | str = None,
+    padding_value: bytes | str = None,
     warning_stack_level: int = None,
 ) -> bytearray | bytes | str:
     if data_sequence_type not in (
@@ -285,16 +299,20 @@ def _normalize_length_of_data_sequence(
     if padding_value is None:
         if isinstance(
             data_sequence,
-            bytearray,
-        ):
-            padding_value = bytearray(b"\0")
-        elif isinstance(
-            data_sequence,
-            bytes,
+            (bytearray, bytes),
         ):
             padding_value = b"\0"
         else:
             padding_value = "_"
+    elif isinstance(
+        data_sequence,
+        (bytearray, bytes),
+    ):
+        if not isinstance(
+            padding_value,
+            bytes,
+        ):
+            raise TypeError(f"Padding value {repr(padding_value)} isn't bytes")
     elif not isinstance(
         padding_value,
         data_sequence_type,
@@ -302,6 +320,9 @@ def _normalize_length_of_data_sequence(
         raise TypeError(
             f"Padding value {repr(padding_value)} isn't {data_sequence_type}"
         )
+
+    if data_sequence_type == bytearray:
+        padding_value = bytearray(padding_value)
 
     (
         left_change,
@@ -361,7 +382,7 @@ def normalize_length_of_mutable_binary(
         int,
         int,
     ] = None,
-    padding_value: bytearray = None,
+    padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytearray:
     warning_stack_level = amend_integer(
