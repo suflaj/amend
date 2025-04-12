@@ -83,7 +83,7 @@ def _amend_data_sequence(
             )
         )
         or (
-            data_sequence == str
+            data_sequence_type == str
             and isinstance(
                 value_on_cast_error,
                 str,
