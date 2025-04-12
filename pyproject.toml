@@ -10,7 +10,7 @@ name = "amend"
 version = "0.2.0"
 description = "Amend: Ensure your values are right"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 authors = [{ name = "Miljenko Šuflaj", email = "suflajmob@gmail.com" }]
 maintainers = [{ name = "Miljenko Šuflaj", email = "suflajmob@gmail.com" }]
 keywords = ["amend", "validation", "correction", "processing"]

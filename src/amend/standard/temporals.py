@@ -16,6 +16,7 @@ import datetime
 from typing import (
     Literal,
     Type,
+    Union,
 )
 import warnings
 
@@ -23,33 +24,47 @@ from amend.built_in.numbers.integers import amend_integer
 
 
 def _amend_temporal_value(
-    temporal_value_type: (
-        Type[datetime.date]
-        | Type[datetime.datetime]
-        | Type[datetime.time]
-        | Type[datetime.timedelta]
-    ),
+    temporal_value_type: Union[
+        Type[datetime.date],
+        Type[datetime.datetime],
+        Type[datetime.time],
+        Type[datetime.timedelta],
+    ],
     temporal_value,
     type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
-    value_on_cast_error: (
-        datetime.date | datetime.datetime | datetime.time | datetime.timedelta
-    ) = None,
-    minimum_value: (
-        datetime.date | datetime.datetime | datetime.time | datetime.timedelta
-    ) = None,
-    maximum_value: (
-        datetime.date | datetime.datetime | datetime.time | datetime.timedelta
-    ) = None,
+    value_on_cast_error: Union[
+        datetime.date,
+        datetime.datetime,
+        datetime.time,
+        datetime.timedelta,
+    ] = None,
+    minimum_value: Union[
+        datetime.date,
+        datetime.datetime,
+        datetime.time,
+        datetime.timedelta,
+    ] = None,
+    maximum_value: Union[
+        datetime.date,
+        datetime.datetime,
+        datetime.time,
+        datetime.timedelta,
+    ] = None,
     value_violation_action: Literal[
         "error",
         "warning",
         "clamp",
     ] = None,
     warning_stack_level: int = None,
-) -> datetime.date | datetime.datetime | datetime.time | datetime.timedelta:
+) -> Union[
+    datetime.date,
+    datetime.datetime,
+    datetime.time,
+    datetime.timedelta,
+]:
     if temporal_value_type not in (
         datetime.date,
         datetime.datetime,

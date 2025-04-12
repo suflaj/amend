@@ -21,6 +21,7 @@ from typing import (
     Literal,
     Tuple,
     Type,
+    Union,
 )
 
 from amend.built_in.numbers.integers import amend_integer
@@ -166,13 +167,10 @@ def determine_length_normalization_strategy(
         "both-but-prioritize-right",
     ] = None,
     warning_stack_level: int = None,
-) -> (
-    Tuple[
-        int,
-        int,
-    ]
-    | None
-):
+) -> Union[
+    Tuple[int, int],
+    None,
+]:
     if truncation_side is not None and truncation_side not in (
         "left",
         "right",
@@ -246,15 +244,30 @@ def determine_length_normalization_strategy(
 
 
 def _normalize_length_of_data_sequence(
-    data_sequence_type: Type[bytearray] | Type[bytes] | Type[str],
-    data_sequence: bytearray | bytes | str,
+    data_sequence_type: Union[
+        Type[bytearray],
+        Type[bytes],
+        Type[str],
+    ],
+    data_sequence: Union[
+        bytearray,
+        bytes,
+        str,
+    ],
     proposed_length_change: Tuple[
         int,
         int,
     ] = None,
-    padding_value: bytes | str = None,
+    padding_value: Union[
+        bytes,
+        str,
+    ] = None,
     warning_stack_level: int = None,
-) -> bytearray | bytes | str:
+) -> Union[
+    bytearray,
+    bytes,
+    str,
+]:
     if data_sequence_type not in (
         bytearray,
         bytes,
@@ -431,7 +444,10 @@ def normalize_length_of_text(
 
 
 def _normalize_length_of_sequence_container(
-    sequence_container: List[Any] | Tuple[Any, ...],
+    sequence_container: Union[
+        List[Any],
+        Tuple[Any, ...],
+    ],
     proposed_length_change: Tuple[
         int,
         int,

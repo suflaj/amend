@@ -18,6 +18,7 @@ from typing import (
     Literal,
     Set,
     Type,
+    Union,
 )
 import warnings
 
@@ -25,7 +26,10 @@ from amend.built_in.numbers.integers import amend_integer
 
 
 def _amend_data_set(
-    data_set_type: Type[frozenset] | Type[set],
+    data_set_type: Union[
+        Type[frozenset],
+        Type[set],
+    ],
     data_set,
     type_mismatch_action: Literal[
         "error",
@@ -39,7 +43,10 @@ def _amend_data_set(
         "warning",
     ] = None,
     warning_stack_level: int = None,
-) -> FrozenSet[Any] | Set[Any]:
+) -> Union[
+    FrozenSet[Any],
+    Set[Any],
+]:
     if data_set_type not in (
         frozenset,
         set,

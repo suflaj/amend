@@ -19,6 +19,7 @@ from typing import (
     Literal,
     Tuple,
     Type,
+    Union,
 )
 import warnings
 
@@ -30,7 +31,10 @@ from amend.utilities.normalization import (
 
 
 def _amend_sequence_container(
-    sequence_container_type: Type[list] | Type[tuple],
+    sequence_container_type: Union[
+        Type[list],
+        Type[tuple],
+    ],
     sequence_container,
     type_mismatch_action: Literal[
         "error",
@@ -59,7 +63,10 @@ def _amend_sequence_container(
     ] = None,
     padding_value: Tuple[Any, ...] = None,
     warning_stack_level: int = None,
-) -> List[Any] | Tuple[Any, ...]:
+) -> Union[
+    List[Any],
+    Tuple[Any, ...],
+]:
     if sequence_container_type not in (
         list,
         tuple,

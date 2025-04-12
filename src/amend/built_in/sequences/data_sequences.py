@@ -16,6 +16,7 @@ from typing import (
     Iterable,
     Literal,
     Type,
+    Union,
 )
 import warnings
 
@@ -27,13 +28,20 @@ from amend.utilities.normalization import (
 
 
 def _amend_data_sequence(
-    data_sequence_type: Type[bytearray] | Type[bytes] | Type[str],
+    data_sequence_type: Union[
+        Type[bytearray],
+        Type[bytes],
+        Type[str],
+    ],
     data_sequence,
     type_mismatch_action: Literal[
         "error",
         "warning",
     ] = None,
-    value_on_cast_error: bytes | str = None,
+    value_on_cast_error: Union[
+        bytes,
+        str,
+    ] = None,
     minimum_length: int = None,
     maximum_length: int = None,
     length_is_multiple_of: Iterable[int] = None,
@@ -54,9 +62,16 @@ def _amend_data_sequence(
         "both-but-prioritize-left",
         "both-but-prioritize-right",
     ] = None,
-    padding_value: bytearray | bytes | str = None,
+    padding_value: Union[
+        bytes,
+        str,
+    ] = None,
     warning_stack_level: int = None,
-) -> bytearray | bytes | str:
+) -> Union[
+    bytearray,
+    bytes,
+    str,
+]:
     if data_sequence_type not in (
         bytearray,
         bytes,
@@ -238,7 +253,7 @@ def amend_mutable_binary(
         "error",
         "warning",
     ] = None,
-    value_on_cast_error: bytearray = None,
+    value_on_cast_error: bytes = None,
     minimum_length: int = None,
     maximum_length: int = None,
     length_is_multiple_of: Iterable[int] = None,
@@ -259,7 +274,7 @@ def amend_mutable_binary(
         "both-but-prioritize-left",
         "both-but-prioritize-right",
     ] = None,
-    padding_value: bytearray = None,
+    padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytearray:
     warning_stack_level = amend_integer(
