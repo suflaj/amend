@@ -95,6 +95,7 @@ def amend_directory(
                     warning_stack_level,
                 )
         try:
+            assert directory is not None
             directory = str(directory)
             directory = Path(directory)
         except Exception:
@@ -228,6 +229,7 @@ def amend_file(
             )
 
     try:
+        assert file is not None
         file = str(file)
         file = Path(file)
     except Exception:
