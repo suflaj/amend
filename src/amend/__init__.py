@@ -17,3 +17,5 @@ from amend.standard import (
     amend_temporal_offset,
     amend_time,
 )
+
+# NOTE: Do not pollute module root with amend.testing submodule!!!
