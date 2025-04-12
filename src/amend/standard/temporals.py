@@ -119,7 +119,11 @@ def _amend_temporal_value(
                     stacklevel=warning_stack_level,
                 )
         try:
-            temporal_value = vars(temporal_value)
+            if not isinstance(
+                temporal_value,
+                dict,
+            ):
+                temporal_value = vars(temporal_value)
             temporal_value = temporal_value_type(**temporal_value)
         except Exception:
             if value_on_cast_error is None:
