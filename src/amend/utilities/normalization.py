@@ -116,33 +116,35 @@ def iterate_over_lengths_satisfying_constraints(
             warning_stack_level=warning_stack_level + 1,
         )
 
-    truncation_proposal = length - (length % differential)
-    padding_proposal = length + differential - (length % differential)
+    length_when_truncated = length - (length % differential)
+    length_when_padded = length + differential - (length % differential)
 
-    new_truncation_proposal = truncation_proposal
-    new_padding_proposal = padding_proposal
-    while True:
-        if minimum_length <= truncation_proposal:
-            if maximum_length is None or truncation_proposal <= maximum_length:
-                yield truncation_proposal - length
-            new_truncation_proposal = truncation_proposal - differential
+    new_length_when_truncated = length_when_truncated
+    new_length_when_padded = length_when_padded
 
-        if maximum_length is None or padding_proposal <= maximum_length:
-            if minimum_length <= padding_proposal:
-                yield padding_proposal - length
-            new_padding_proposal = padding_proposal + differential
+    while (
+        length_when_truncated >= minimum_length
+        or maximum_length is None
+        or length_when_padded <= maximum_length
+    ):
+        if length_when_truncated >= minimum_length:
+            if maximum_length is None or length_when_truncated <= maximum_length:
+                yield length_when_truncated - length
+            new_length_when_truncated = length_when_truncated - differential
+
+        if maximum_length is None or length_when_padded <= maximum_length:
+            if length_when_padded >= minimum_length:
+                yield length_when_padded - length
+            new_length_when_padded = length_when_padded + differential
 
         if (
-            new_truncation_proposal == truncation_proposal
-            and new_padding_proposal == padding_proposal
-        ) or (
-            truncation_proposal < minimum_length
-            and (maximum_length is not None and padding_proposal > maximum_length)
+            new_length_when_truncated == length_when_truncated
+            and new_length_when_padded == length_when_padded
         ):
             break
 
-        truncation_proposal = new_truncation_proposal
-        padding_proposal = new_padding_proposal
+        length_when_truncated = new_length_when_truncated
+        length_when_padded = new_length_when_padded
     return
 
 
