@@ -32,6 +32,35 @@ def find_least_common_multiplier(
     multiples: Iterable[int] = None,
     warning_stack_level: int = None,
 ) -> int:
+    """Finds the least common multiplier for 1 or more natural number multiples.
+
+    Parameters
+    ----------
+    multiples : Iterable[int]
+        Natural numbers the result should be a multiple of. By default, returns 1
+        (trivial solution).
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    int
+        The least common multiplier of `multiples`.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `multiples` isn't iterable
+
+    ValueError
+        - any element of `multiples` is smaller than 1
+
+    Warns
+    -----
+        When any of the following applies:
+        - every time element in `multiples` isn't an int
+    """
     if multiples is None:
         return 1
     try:
@@ -80,25 +109,63 @@ def iterate_over_lengths_satisfying_constraints(
     None,
     None,
 ]:
-    length = amend_integer(
-        length,
-        type_mismatch_action="error",
-        minimum_value=0,
-        value_violation_action="error",
-        warning_stack_level=3,
-    )
-    minimum_length = amend_integer(
-        minimum_length,
-        value_on_cast_error=0,
-        minimum_value=0,
-        value_violation_action="clamp",
-    )
+    """Iterates over all lengths that satisfy given constraints.
+
+    Parameters
+    ----------
+    length : int
+        The base length proposition.
+    minimum_length : int
+        The smallest allowed length. Defaults to no lower limit.
+    maximum_length : int
+        The largest allowed length. Defaults to no upper limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers length propositions should be a multiple of. Ignores length
+        factorization by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Yields
+    ------
+    int
+        Length proposal satisfying given constraints.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `length` isn't an int
+
+    ValueError
+        When any of the following applies:
+        - `length` is smaller than 0
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `maximum_length` isn't None and isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
         minimum_value=2,
         value_violation_action="clamp",
         warning_stack_level=3,
+    )
+    length = amend_integer(
+        length,
+        type_mismatch_action="error",
+        minimum_value=0,
+        value_violation_action="error",
+        warning_stack_level=warning_stack_level + 1,
+    )
+    minimum_length = amend_integer(
+        minimum_length,
+        value_on_cast_error=0,
+        minimum_value=0,
+        value_violation_action="clamp",
+        warning_stack_level=warning_stack_level + 1,
     )
     if maximum_length is not None:
         maximum_length = amend_integer(
@@ -171,6 +238,56 @@ def determine_length_normalization_strategy(
     Tuple[int, int],
     None,
 ]:
+    """Determines how many elements to truncate or pad on the left and/or on the right.
+
+    Parameters
+    ----------
+    length : int
+        The base length proposition.
+    minimum_length : int
+        The smallest allowed length. Defaults to no lower limit.
+    maximum_length : int
+        The largest allowed length. Defaults to no upper limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers length propositions should be a multiple of. Ignores length
+        factorization by default.
+    truncation_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to truncate on. If 'left', will truncate from the left. If 'right',
+        will truncate from the right. If 'both-but-prioritize-left', will truncate from
+        both sides equally, giving priority to left-truncation. If
+        'both-but-prioritize-right', will truncate from both sides equally, giving
+        priority to right-truncation. Truncation is disabled by default.
+    padding_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to pad to. If 'left', will pad to the left. If 'right', will pad to
+        the right. If 'both-but-prioritize-left', will pad to both sides equally, giving priority to left-padding. If 'both-but-prioritize-right', will pad to
+        both sides equally, giving priority to right-padding. Padding is disabled by
+        default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Union[Tuple[int, int], None]
+        A pair of integers showing how many elements on each side need to be added or
+        removed, or None if there is no valid length normalization strategy for the
+        given constraints.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `length` isn't an int
+
+    ValueError
+        When any of the following applies:
+        - `length` is smaller than 0
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `maximum_length` isn't None and isn't an int
+    """
     if truncation_side is not None and truncation_side not in (
         "left",
         "right",
@@ -268,6 +385,50 @@ def _normalize_length_of_data_sequence(
     bytes,
     str,
 ]:
+    """Normalizes length of a data sequence given contraints.
+
+    Parameters
+    ----------
+    data_sequence_type : Union[Type[bytearray], Type[bytes], Type[str]]
+        Type of the data sequence; either a bytearray, bytes or str.
+    data_sequence : Union[bytearray, bytes, str]
+        A data sequence; either an instance of a bytearray, bytes or str.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : Union[bytes, str]
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte or ASCII underscore ('_').
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Union[bytearray, bytes, str]
+        The data sequence with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `data_sequence` isn't a `data_sequence_type`
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't bytes when `data_sequence_type` is
+        is bytearray or bytes, or str when `data_sequence_type` is str
+
+    ValueError
+        When any of the following applies:
+        - `data_sequence_type` is not bytearray, bytes or str
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     if data_sequence_type not in (
         bytearray,
         bytes,
@@ -374,6 +535,46 @@ def normalize_length_of_immutable_binary(
     padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytes:
+    """Normalizes length of an immutable binary given contraints.
+
+    Parameters
+    ----------
+    immutable_binary : bytes
+        An immutable binary; an instance of bytes.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : bytes
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    bytes
+        The immutable binary with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `immutable_binary` isn't bytes
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't bytes
+
+    ValueError
+        When any of the following applies:
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -400,6 +601,46 @@ def normalize_length_of_mutable_binary(
     padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytearray:
+    """Normalizes length of a mutable binary given contraints.
+
+    Parameters
+    ----------
+    mutable_binary : bytearray
+        A mutable binary; an instance of bytearray.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : bytes
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    bytearray
+        The mutable binary with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `mutable_binary` isn't a bytearray
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't bytes
+
+    ValueError
+        When any of the following applies:
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -426,6 +667,46 @@ def normalize_length_of_text(
     padding_value: str = None,
     warning_stack_level: int = None,
 ) -> str:
+    """Normalizes length of text given contraints.
+
+    Parameters
+    ----------
+    text : str
+        Text; an instance of str.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : str
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        ASCII underscore ('_').
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    str
+        The text with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `text` isn't a str
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't a str
+
+    ValueError
+        When any of the following applies:
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -444,6 +725,10 @@ def normalize_length_of_text(
 
 
 def _normalize_length_of_sequence_container(
+    sequence_container_type: Union[
+        Type[list],
+        Type[tuple],
+    ],
     sequence_container: Union[
         List[Any],
         Tuple[Any, ...],
@@ -454,12 +739,65 @@ def _normalize_length_of_sequence_container(
     ] = None,
     padding_value: Tuple[Any, ...] = None,
     warning_stack_level: int = None,
-) -> List[Any]:
-    try:
-        sequence_container = list(sequence_container)
-    except Exception:
+) -> Union[
+    List[Any],
+    Tuple[Any, ...],
+]:
+    """Normalizes length of a sequence container given contraints.
+
+    Parameters
+    ----------
+    sequence_container_type: Union[Type[list], Type[tuple]]
+        Type of the sequence container; either a list or tuple.
+    sequence_container:
+        A sequence container; either an instance of a list or tuple.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : Tuple[Any, ...]
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with None.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    List[Any]
+        The sequence container with normalized length as a list.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `sequence_container` isn't a `sequence_container_type`
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't a tuple
+
+    ValueError
+        When any of the following applies:
+        - `sequence_container_type` isn't a list or tuple
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
+    if sequence_container_type not in (
+        list,
+        tuple,
+    ):
+        raise ValueError(
+            f"Invalid sequence container type {repr(sequence_container_type)}"
+        )
+    if not isinstance(
+        sequence_container,
+        sequence_container_type,
+    ):
         raise TypeError(
-            f"Sequence container {repr(sequence_container)} can't become a list"
+            f"Entity {repr(sequence_container)} isn't {sequence_container_type}"
         )
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
@@ -503,6 +841,8 @@ def _normalize_length_of_sequence_container(
     else:
         padding_value = list(padding_value)
 
+    sequence_container = list(sequence_container)
+
     (
         left_change,
         right_change,
@@ -538,6 +878,45 @@ def normalize_length_of_immutable_sequence(
     padding_value: Tuple[Any, ...] = None,
     warning_stack_level: int = None,
 ) -> Tuple[Any, ...]:
+    """Normalizes length of an immutable sequence given contraints.
+
+    Parameters
+    ----------
+    immutable_sequence:
+        An immutable sequence; an instance of a tuple.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : Tuple[Any, ...]
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with None.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Tuple[Any, ...]
+        The immutable sequence with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `immutable_sequence` isn't a tuple
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't a tuple
+
+    ValueError
+        When any of the following applies:
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -548,6 +927,7 @@ def normalize_length_of_immutable_sequence(
 
     return tuple(
         _normalize_length_of_sequence_container(
+            sequence_container_type=tuple,
             sequence_container=immutable_sequence,
             proposed_length_change=proposed_length_change,
             padding_value=padding_value,
@@ -565,6 +945,45 @@ def normalize_length_of_mutable_sequence(
     padding_value: Tuple[Any, ...] = None,
     warning_stack_level: int = None,
 ) -> List[Any]:
+    """Normalizes length of a mutable sequence given contraints.
+
+    Parameters
+    ----------
+    mutable_sequence:
+        A mutable sequence; an instance of a list.
+    proposed_length_change : Tuple[int, int]
+        A pair of integers showing how many elements on each side should be added or
+        removed.
+    padding_value : Tuple[Any, ...]
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with None.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    List[Any]
+        The mutable sequence with normalized length.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `mutable_sequence` isn't a list
+        - `proposed_length_change` isn't a tuple
+        - `padding_value` isn't None and isn't a tuple
+
+    ValueError
+        When any of the following applies:
+        - `proposed_length_change` doesn't have length of 2
+        - any element in `proposed_length_change` fails to be cast into int
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - any element in `proposed_length_change` isn't an int
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -575,6 +994,7 @@ def normalize_length_of_mutable_sequence(
 
     return list(
         _normalize_length_of_sequence_container(
+            sequence_container_type=list,
             sequence_container=mutable_sequence,
             proposed_length_change=proposed_length_change,
             padding_value=padding_value,
@@ -593,6 +1013,26 @@ def get_immutable_mapping(
     ],
     ...,
 ]:
+    """Gets an immutable mapping from a mapping.
+
+    Parameters
+    ----------
+    mapping
+        Something that should in essence be a mapping.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Tuple[Tuple[Any, Any], ...]
+        The immutable mapping.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies
+        - `dict(data_mapping)` throws an Exception
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
