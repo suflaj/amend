@@ -40,13 +40,13 @@ pip install .
 
 Amend uses your run-of-the-mill `unittest`. Therefore, to test the whole package, you can simply do:
 
-```python
+```bash
 python3 -m unittest amend.testing
 ```
 
 If you wish to test some specific module you can reference the testing module with unittest. For example, if you want to unit test built-in amendments, do:
 
-```
+```bash
 python3 -m unittest amend.testing.unit.built_in
 ```
 
