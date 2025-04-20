@@ -36,6 +36,22 @@ cd amend
 pip install .
 ```
 
+## Running tests
+
+Amend uses your run-of-the-mill `unittest`. Therefore, to test the whole package, you can simply do:
+
+```python
+python3 -m unittest amend.testing
+```
+
+If you wish to test some specific module you can reference the testing module with unittest. For example, if you want to unit test built-in amendments, do:
+
+```
+python3 -m unittest amend.testing.unit.built_in
+```
+
+For more info on how to use `unittest`, look [here](https://docs.python.org/3/library/unittest.html).
+
 ## Things to do
 
 This package is in beta. For it to reach a full release it will need to receive:
