@@ -47,6 +47,62 @@ def _amend_data_set(
     FrozenSet[Any],
     Set[Any],
 ]:
+    """Amend a data set.
+
+    Parameters
+    ----------
+    data_set_type : Union[Type[frozenset], Type[set]]
+        Type of the sequence container; either a frozenset or set.
+    data_set
+        Something that should in essence be a data set.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `data_set` isn't a `data_set_type`. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : FrozenSet[Any]
+        Value to set `data_set` to if `data_set_type(data_set)` throws an Exception. By
+        default, raises a TypeError.
+    minimum_length : int
+        The smallest length `data_set` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest value `data_set` can have. Defaults to no upper limit.
+    length_violation_action: Literal['error', 'warning']
+        What to do if `data_set` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. Ignores length violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Union[FrozenSet[Any], Set[Any]]
+        The amended data set.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `data_set` isn't a `data_set_type` and `type_mismatch_action` is 'error'
+        - `data_set_type(data_set)` throws an Exception and `value_on_cast_error` is
+        None
+
+    ValueError
+        When any of the following applies:
+        - `data_set_type` is not a list or tuple
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a frozenset
+        - `length_violation_action` isn't None, 'error' or 'warning'
+        - `data_set` length isn't between `minimum_length` and `maximum_length` and
+        `length_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `data_set` isn't a `data_set_type` and `type_mismatch_action` is 'warning'
+        - `data_set` length isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     if data_set_type not in (
         frozenset,
         set,
@@ -171,6 +227,59 @@ def amend_immutable_data_set(
     ] = None,
     warning_stack_level: int = None,
 ) -> FrozenSet[Any]:
+    """Amend a immutable data set.
+
+    Parameters
+    ----------
+    immutable_data_set
+        Something that should in essence be a immutable data set.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `immutable_data_set` isn't a frozenset. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : FrozenSet[Any]
+        Value to set `data_set` to if `frozenset(data_set)` throws an Exception. By
+        default, raises a TypeError.
+    minimum_length : int
+        The smallest length `immutable_data_set` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest value `immutable_data_set` can have. Defaults to no upper limit.
+    length_violation_action: Literal['error', 'warning']
+        What to do if `immutable_data_set` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. Ignores length violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    FrozenSet[Any]
+        The amended immutable data set.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `immutable_data_set` isn't a frozenset and `type_mismatch_action` is 'error'
+        - `frozenset(data_set)` throws an Exception and `value_on_cast_error` is
+        None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a frozenset
+        - `length_violation_action` isn't None, 'error' or 'warning'
+        - `immutable_data_set` length isn't between `minimum_length` and
+        `maximum_length` and `length_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `immutable_data_set` isn't a frozenset and `type_mismatch_action` is 'warning'
+        - `immutable_data_set` length isn't between `minimum_length` and
+        `maximum_length` and `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -206,6 +315,59 @@ def amend_mutable_data_set(
     ] = None,
     warning_stack_level: int = None,
 ) -> Set[Any]:
+    """Amend a mutable data set.
+
+    Parameters
+    ----------
+    mutable_data_set
+        Something that should in essence be a mutable data set.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `mutable_data_set` isn't a frozenset. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : FrozenSet[Any]
+        Value to set `data_set` to if `set(data_set)` throws an Exception. By default,
+        raises a TypeError.
+    minimum_length : int
+        The smallest length `mutable_data_set` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest value `mutable_data_set` can have. Defaults to no upper limit.
+    length_violation_action: Literal['error', 'warning']
+        What to do if `mutable_data_set` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. Ignores length violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Set[Any]
+        The amended mutable data set.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `mutable_data_set` isn't a set and `type_mismatch_action` is 'error'
+        - `set(data_set)` throws an Exception and `value_on_cast_error` is
+        None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a frozenset
+        - `length_violation_action` isn't None, 'error' or 'warning'
+        - `mutable_data_set` length isn't between `minimum_length` and `maximum_length`
+        and `length_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `mutable_data_set` isn't a set and `type_mismatch_action` is 'warning'
+        - `mutable_data_set` length isn't between `minimum_length` and `maximum_length`
+        and `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,

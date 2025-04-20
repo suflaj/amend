@@ -44,6 +44,72 @@ def amend_real_number(
     number_of_rounding_decimals: int = None,
     warning_stack_level: int = None,
 ) -> int:
+    """Amend a real number.
+
+    Parameters
+    ----------
+    real_number
+        Something that should in essence be a real_number.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `real_number` isn't a float. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : float
+        Value to set `real_number` to if `float(real_number)` throws an Exception. By
+        default, raises a TypeError.
+    minimum_value : float
+        The smallest value `real_number` can have. Defaults to no lower limit.
+    maximum_value : float
+        The largest value `real_number` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `real_number` is not between `minimum_value` and `maximum_value`.
+        If 'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp',
+        clamps `real_number` between `minimum_value` and `maximum_value`. Ignores value
+        violations by default.
+    infinite_value_action : Literal['error', 'warning']
+        What to do if `real_number` is an infinity. If 'error', raises a ValueError. If
+        'warning', raises a UserWarning. Ignores infinite values by default.
+    not_a_number_value_action : Literal['error', 'warning']
+        What to do if `real_number` is not-a-number. If 'error', raises a ValueError.
+        If 'warning', raises a UserWarning. Ignores not-a-number values by default.
+    number_of_rounding_decimals : int
+        Number of decimals to round `real_number` to. Leave as-is by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    float
+        The amended real number.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies
+        - `real_number` isn't a float and `type_mismatch_action` is 'error'
+        - `float(real_number)` throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a float
+        - `minimum_value` isn't None and isn't a float
+        - `maximum_value` isn't None and isn't a float
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `infinite_value_action` isn't None, 'error' or 'warning'
+        - `not_a_number_value_action` isn't None, 'error' or 'warning'
+        - `real_number` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+        - `real_number` is an inifinity and `infinite_value_action` is 'error'
+        - `real_number` is not-a-number and `not_a_number_value_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `real_number` isn't a float and `type_mismatch_action` is 'warning'
+        - `real_number` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     if type_mismatch_action not in (
         None,
         "error",

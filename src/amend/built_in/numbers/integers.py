@@ -32,6 +32,60 @@ def amend_integer(
     ] = None,
     warning_stack_level: int = None,
 ) -> int:
+    """Amend an integer.
+
+    Parameters
+    ----------
+    integer
+        Something that should in essence be an integer.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `integer` isn't an int. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : int
+        Value to set `integer` to if `int(integer)` throws an Exception. By default,
+        raises a TypeError.
+    minimum_value : int
+        The smallest value `integer` can have. Defaults to no lower limit.
+    maximum_value : int
+        The largest value `integer` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `integer` is not between `minimum_value` and `maximum_value`. If
+        'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp',
+        clamps `integer` between `minimum_value` and `maximum_value`. Ignores value
+        violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    int
+        The amended integer.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `integer` isn't an int and `type_mismatch_action` is 'error'
+        - `int(integer)` throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't an int
+        - `minimum_value` isn't None and isn't an int
+        - `maximum_value` isn't None and isn't an int
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `integer` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `integer` isn't an int and `type_mismatch_action` is 'warning'
+        - `integer` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     if type_mismatch_action not in (
         None,
         "error",

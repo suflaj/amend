@@ -43,6 +43,67 @@ def _amend_data_mapping(
     ] = None,
     warning_stack_level: int = None,
 ) -> Dict[Any, Any]:
+    """Amend a data mapping.
+
+    Parameters
+    ----------
+    data_mapping_type : Type[dict]
+        Type of the data mapping. Only dict for now.
+    data_mapping
+        Something that should in essence be a data mapping.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `data_mapping` isn't a `data_mapping_type`. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : Tuple[Tuple[Any, Any], ...]
+        Value to set `data_mapping` to if `data_mapping_type(data_mapping)` throws an
+        Exception. By default, raises a TypeError.
+    minimum_length : int
+        The smallest length `data_mapping` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest length `data_mapping` can have. Defaults to no upper limit.
+    length_violation_action: Literal['error', 'warning']
+        What to do if `data_mapping` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a UserWarning. Ignores length violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Dict[Any, Any]
+        The amended data mapping.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies
+        - `data_mapping` isn't a `data_mapping_type` and `type_mismatch_action` is
+        'error'
+        - `data_mapping_type(data_mapping)` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `data_mapping_type` isn't a dict
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a tuple of only tuples
+        - `warning_stack_level` isn't None or in essence an integer >= 2
+        - `minimum_length` isn't None or in essence an integer >= 0
+        - `maximum_length` isn't None or in essence an integer >= 0
+        - `length_violation_action` isn't None, 'error', or 'warning'
+        - `data_mapping` length isn't between `minimum_length` and `maximum_length` and
+        `length_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `data_mapping` isn't a `data_mapping_type` and `type_mismatch_action` is
+        'warning'
+        - `data_mapping` length isn't between `minimum_length` and `maximum_length` and
+        `length_violation_action` is 'warning'
+    """
+
     if data_mapping_type not in (dict,):
         raise ValueError(f"Invalid data mapping type {repr(data_mapping_type)}")
     if type_mismatch_action not in (
@@ -179,6 +240,60 @@ def amend_mutable_data_mapping(
     ] = None,
     warning_stack_level: int = None,
 ) -> Dict[Any, Any]:
+    """Amend a mutable data mapping.
+
+    Parameters
+    ----------
+    mutable_data_mapping
+        Something that should in essence be a mutable data mapping.
+    mutable_data_mapping : Literal['error', 'warning']
+        What to do if `mutable_data_mapping` isn't a `dict. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : Tuple[Tuple[Any, Any], ...]
+        Value to set `mutable_data_mapping` to if `dict(data_mapping)` throws an
+        Exception. By default, raises a TypeError.
+    minimum_length : int
+        The smallest length `data_mapping` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest length `data_mapping` can have. Defaults to no upper limit.
+    length_violation_action: Literal['error', 'warning']
+        What to do if `mutable_data_mapping` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a UserWarning. Ignores length violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Dict[Any, Any]
+        The amended mutable data mapping.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies
+        - `mutable_data_mapping` isn't a dict and `type_mismatch_action` is 'error'
+        - `dict(data_mapping)` throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a tuple of only tuples
+        - `warning_stack_level` isn't None or in essence an integer >= 2
+        - `minimum_length` isn't None or in essence an integer >= 0
+        - `maximum_length` isn't None or in essence an integer >= 0
+        - `length_violation_action` isn't None, 'error', or 'warning'
+        - `data_mapping` length isn't between `minimum_length` and `maximum_length` and
+        `length_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `data_mapping` isn't a dict and `type_mismatch_action` is 'warning'
+        - `data_mapping` length isn't between `minimum_length` and `maximum_length` and
+        `length_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,

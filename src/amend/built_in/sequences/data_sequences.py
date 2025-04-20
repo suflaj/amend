@@ -72,6 +72,84 @@ def _amend_data_sequence(
     bytes,
     str,
 ]:
+    """Amend a data sequence.
+
+    Parameters
+    ----------
+    data_sequence_type : Union[Type[bytearray], Type[bytes], Type[str]]
+        Type of the data sequence; either a bytearray, bytes or str.
+    data_sequence
+        Something that should in essence be a data sequence.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `data_sequence` isn't a `data_sequence_type`. If 'error', raises
+        a TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : Union[bytes, str]
+        Value to set `data_sequence` to if `data_sequence_type(data_sequence)` throws
+        an Exception. By default, raises a TypeError.
+    minimum_length : int
+        The smallest length `data_sequence` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest value `data_sequence` can have. Defaults to no upper limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers `data_sequence` length should be a multiple of. Ignores length
+        factorization by default.
+    length_violation_action: Literal['error', 'warning', 'truncate-and-pad']
+        What to do if `data_sequence` length is not between `minimum_length` and `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a UserWarning. If 'truncate-and-pad', will attempt to truncate or pad `data_sequence` to satisfy `minimum_length`, `maximum_length` and
+        `length_is_multiple_of`. Ignores length violations by default.
+    truncation_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to truncate on. If 'left', will truncate from the left. If 'right',
+        will truncate from the right. If 'both-but-prioritize-left', will truncate from
+        both sides equally, giving priority to left-truncation. If
+        'both-but-prioritize-right', will truncate from both sides equally, giving
+        priority to right-truncation. Truncation is disabled by default.
+    padding_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to pad to. If 'left', will pad to the left. If 'right', will pad to
+        the right. If 'both-but-prioritize-left', will pad to both sides equally, giving priority to left-padding. If 'both-but-prioritize-right', will pad to
+        both sides equally, giving priority to right-padding. Padding is disabled by
+        default.
+    padding_value : Union[bytes, str]
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte or ASCII underscore ('_').
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Union[bytearray, bytes, str]
+        The amended data sequence.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `data_sequence` isn't a `data_sequence_type` and `type_mismatch_action` is
+        'error'
+        - `data_sequence_type(data_sequence)` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `data_sequence_type` is not bytearray, bytes or str
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't bytes when `data_sequence_type` is
+        is bytearray or bytes, or str when `data_sequence_type` is str
+        - `length_violation_action` isn't None, 'error', 'warning' or 'truncate-or-pad'
+        - `data_sequence` length isn't between `minimum_length` and `maximum_length`
+        and/or doesn't satisfy `length_is_multiple_of` and `length_violation_action`
+        is 'error'
+        - isn't possible to transform `data_sequence` to fit length constraints
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `data_sequence` isn't a `data_sequence_type` and `type_mismatch_action` is
+        'warning'
+        - `data_sequence` isn't between `minimum_length` and `maximum_length` and/or
+        doesn't satisfy `length_is_multiple_of` and `value_violation_action` is
+        'warning'
+    """
     if data_sequence_type not in (
         bytearray,
         bytes,
@@ -223,6 +301,86 @@ def amend_immutable_binary(
     padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytes:
+    """Amend an immutable data sequence.
+
+    Parameters
+    ----------
+    immutable_data_sequence
+        Something that should in essence be an immutable data sequence.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `immutable_data_sequence` isn't bytes. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : bytes
+        Value to set `immutable_data_sequence` to if `bytes(immutable_data_sequence)`
+        throws an Exception. By default, raises a TypeError.
+    minimum_length : int
+        The smallest length `immutable_data_sequence` can have. Defaults to no lower
+        limit.
+    maximum_length : int
+        The largest length `immutable_data_sequence` can have. Defaults to no lower
+        limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers `immutable_data_sequence` length should be a multiple of.
+        Ignores length factorization by default.
+    length_violation_action: Literal['error', 'warning', 'truncate-and-pad']
+        What to do if `immutable_data_sequence` length is not between `minimum_length`
+        and `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. If 'truncate-and-pad', will attempt to truncate or pad
+        `immutable_data_sequence` to satisfy `minimum_length`, `maximum_length` and
+        `length_is_multiple_of`. Ignores length violations by default.
+    truncation_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to truncate on. If 'left', will truncate from the left. If 'right',
+        will truncate from the right. If 'both-but-prioritize-left', will truncate from
+        both sides equally, giving priority to left-truncation. If
+        'both-but-prioritize-right', will truncate from both sides equally, giving
+        priority to right-truncation. Truncation is disabled by default.
+    padding_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to pad to. If 'left', will pad to the left. If 'right', will pad to
+        the right. If 'both-but-prioritize-left', will pad to both sides equally, giving priority to left-padding. If 'both-but-prioritize-right', will pad to
+        both sides equally, giving priority to right-padding. Padding is disabled by
+        default.
+    padding_value : bytes
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    bytes
+        The amended immutable data sequence.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `immutable_data_sequence` isn't bytes and `type_mismatch_action` is 'error'
+        - `bytes(immutable_data_sequence)` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't bytes
+        - `length_violation_action` isn't None, 'error', 'warning' or 'truncate-or-pad'
+        - `immutable_data_sequence` length isn't between `minimum_length` and
+        `maximum_length`
+        and/or doesn't satisfy `length_is_multiple_of` and `length_violation_action`
+        is 'error'
+        - isn't possible to transform `immutable_data_sequence` to fit length
+        constraints
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `immutable_data_sequence` isn't bytes and `type_mismatch_action` is 'warning'
+        - `immutable_data_sequence` isn't between `minimum_length` and `maximum_length`
+        and/or doesn't satisfy `length_is_multiple_of` and `value_violation_action` is
+        'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -277,6 +435,86 @@ def amend_mutable_binary(
     padding_value: bytes = None,
     warning_stack_level: int = None,
 ) -> bytearray:
+    """Amend a mutable data sequence.
+
+    Parameters
+    ----------
+    mutable_data_sequence
+        Something that should in essence be an mutable data sequence.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `mutable_data_sequence` isn't bytes. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : bytes
+        Value to set `mutable_data_sequence` to if `bytes(mutable_data_sequence)`
+        throws an Exception. By default, raises a TypeError.
+    minimum_length : int
+        The smallest length `mutable_data_sequence` can have. Defaults to no lower
+        limit.
+    maximum_length : int
+        The largest length `mutable_data_sequence` can have. Defaults to no lower
+        limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers `mutable_data_sequence` length should be a multiple of. Ignores
+        length factorization by default.
+    length_violation_action: Literal['error', 'warning', 'truncate-and-pad']
+        What to do if `mutable_data_sequence` length is not between `minimum_length`
+        and `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. If 'truncate-and-pad', will attempt to truncate or pad
+        `mutable_data_sequence` to satisfy `minimum_length`, `maximum_length` and
+        `length_is_multiple_of`. Ignores length violations by default.
+    truncation_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to truncate on. If 'left', will truncate from the left. If 'right',
+        will truncate from the right. If 'both-but-prioritize-left', will truncate from
+        both sides equally, giving priority to left-truncation. If
+        'both-but-prioritize-right', will truncate from both sides equally, giving
+        priority to right-truncation. Truncation is disabled by default.
+    padding_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to pad to. If 'left', will pad to the left. If 'right', will pad to
+        the right. If 'both-but-prioritize-left', will pad to both sides equally, giving priority to left-padding. If 'both-but-prioritize-right', will pad to
+        both sides equally, giving priority to right-padding. Padding is disabled by
+        default.
+    padding_value : bytes
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with the
+        null byte.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    bytes
+        The amended mutable data sequence.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `mutable_data_sequence` isn't a bytearray and `type_mismatch_action` is
+        'error'
+        - `bytearray(mutable_data_sequence)` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't bytes
+        - `length_violation_action` isn't None, 'error', 'warning' or 'truncate-or-pad'
+        - `mutable_data_sequence` length isn't between `minimum_length` and
+        `maximum_length` and/or doesn't satisfy `length_is_multiple_of` and
+        `length_violation_action` is 'error'
+        - isn't possible to transform `mutable_data_sequence` to fit length constraints
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `mutable_data_sequence` isn't a bytearray and `type_mismatch_action` is
+        'warning'
+        - `mutable_data_sequence` isn't between `minimum_length` and `maximum_length`
+        and/or doesn't satisfy `length_is_multiple_of` and `value_violation_action` is
+        'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -331,6 +569,78 @@ def amend_text(
     padding_value: str = None,
     warning_stack_level: int = None,
 ) -> str:
+    """Amend text.
+
+    Parameters
+    ----------
+    text
+        Something that should in essence be text.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `text` isn't str. If 'error', raises a TypeError. If 'warning',
+        raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : str
+        Value to set `text` to if `str(text)` throws an Exception. By default, raises a
+        TypeError.
+    minimum_length : int
+        The smallest length `text` can have. Defaults to no lower limit.
+    maximum_length : int
+        The largest length `text` can have. Defaults to no lower limit.
+    length_is_multiple_of : Iterable[int]
+        Natural numbers `text` length should be a multiple of. Ignores length
+        factorization by default.
+    length_violation_action: Literal['error', 'warning', 'truncate-and-pad']
+        What to do if `text` length is not between `minimum_length` and
+        `maximum_length`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. If 'truncate-and-pad', will attempt to truncate or pad
+        `mutable_data_sequence` to satisfy `minimum_length`, `maximum_length` and
+        `length_is_multiple_of`. Ignores length violations by default.
+    truncation_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to truncate on. If 'left', will truncate from the left. If 'right',
+        will truncate from the right. If 'both-but-prioritize-left', will truncate from
+        both sides equally, giving priority to left-truncation. If
+        'both-but-prioritize-right', will truncate from both sides equally, giving
+        priority to right-truncation. Truncation is disabled by default.
+    padding_side : Literal["left", "right", "both-but-prioritize-left", "both-but-prioritize-right"]
+        What side to pad to. If 'left', will pad to the left. If 'right', will pad to
+        the right. If 'both-but-prioritize-left', will pad to both sides equally, giving priority to left-padding. If 'both-but-prioritize-right', will pad to
+        both sides equally, giving priority to right-padding. Padding is disabled by
+        default.
+    padding_value : str
+        Value with which to pad. If value is shorter than the amount to pad it will be
+        automatically repeated to fit the necessary length. By default, pad with ASCII
+        underscore ('_').
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    str
+        The amended text.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `text` isn't a str and `type_mismatch_action` is 'error'
+        - `str(text)` throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't str
+        - `length_violation_action` isn't None, 'error', 'warning' or 'truncate-or-pad'
+        - `text` length isn't between `minimum_length` and `maximum_length` and/or
+        doesn't satisfy `length_is_multiple_of` and `length_violation_action` is 'error'
+        - isn't possible to transform `text` to fit length constraints
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `text` isn't a str and `type_mismatch_action` is 'warning'
+        - `text` isn't between `minimum_length` and `maximum_length` and/or doesn't
+        satisfy `length_is_multiple_of` and `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
