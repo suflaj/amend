@@ -40,8 +40,8 @@ pip install .
 
 This package is in beta. For it to reach a full release it will need to receive:
 
-- documented code
 - ReadTheDocs documentations
-- full test coverage
+- usage examples
+- some actual usage (will start to substitute my boilerplate for it)
 
 Currently, it wasn't battle tested. I put in some effort to write it well, but not necessarily optimally. However, even though I do not recommend you use this for production, you can use it for many things, and presumably it should work. If it doesn't, [create an issue](https://github.com/suflaj/amend/issues). The format doesn't really matter currently.
