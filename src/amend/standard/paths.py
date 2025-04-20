@@ -38,6 +38,74 @@ def amend_directory(
     ] = None,
     warning_stack_level: int = None,
 ) -> Path:
+    """Amend a directory.
+
+    Parameters
+    ----------
+    directory
+        Something that should in essence be a directory.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `directory` isn't a pathlib.Path. If 'error', raises a
+        TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : Path
+        Value to set `directory` to if `directory` is None, if `str(directory)` throws an Exception or `pathlib.Path(directory)` throws an Exception. By default,
+        raises a TypeError.
+    not_existing_action : Literal['error', 'warning', 'make']
+        What to do if `directory` doesn't exist. If 'error', raises an OSError. If
+        'warning', raises a UserWarning. If 'make', creates the directory alongside all
+        of its parents that don't exist. Ignores if `directory` doesn't exist by
+        default.
+    category_mismatch_action : Literal['error', 'warning', 'take-parent']
+        What to do if `directory` isn't an actual directory. If 'error', raises
+        NotADirectoryError. If 'warning', raises UserWarning. If 'take-parent', sets
+        `directory` to its parent. Ignores if `directory` is something else by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    pathlib.Path
+        The amended directory.
+
+    Raises
+    ------
+    NotADirectoryError
+        When any of the following applies:
+        - `directory` exists but isn't a directory and `category_mismatch_action` is
+        'error'
+
+    OSError
+        When any of the following applies:
+        - `directory` doesn't exist and `not_existing_action` is 'error'
+        - `directory` doesn't exist, `not_existing_action` is 'make' and directory
+        creation fails
+        - `directory` isn't an actual directory, `category_mismatch_action` is
+        'take-parent', but the parent of `directory` is also not a directory (I don't
+        know why this would happen, actually, but I'm no expert)
+
+    TypeError
+        When any of the following applies:
+        - `directory` isn't a pathlib.Path and `type_mismatch_action` is 'error'
+        - `directory` is None, `str(directory)` throws an Exception or
+        `pathlib.Path(directory)` throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None or a pathlib.Path
+        - `not_existing_action` isn't None, 'error', 'warning' or 'make'
+        - `category_mismatch_action` isn't None, 'error', 'warning' or 'take-parent'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `directory` isn't a pathlib.Path and `type_mismatch_action` is 'warning'
+        - `directory` doesn't exist and `not_existing_action` is 'warning'
+        - `directory` isn't an actual directory and `category_mismatch_action` is
+        'warning'
+    """
     if type_mismatch_action not in (
         None,
         "error",
@@ -51,7 +119,6 @@ def amend_directory(
                 value_on_cast_error,
                 Path,
             )
-            and (value_on_cast_error.is_dir() or not value_on_cast_error.exists())
         )
     ):
         raise ValueError(f"Invalid value on cast error {repr(value_on_cast_error)}")
@@ -170,6 +237,63 @@ def amend_file(
     ] = None,
     warning_stack_level: int = None,
 ) -> Path:
+    """Amend a file.
+
+    Parameters
+    ----------
+    file
+        Something that should in essence be a file.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `file` isn't a pathlib.Path. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : Path
+        Value to set `file` to if `file` is None, if `str(file)` throws an Exception or `pathlib.Path(file)` throws an Exception. By default, raises a TypeError.
+    not_existing_action : Literal['error', 'warning', 'make', 'make-parent']
+        What to do if `file` doesn't exist. If 'error', raises a OSError. If
+        'warning', raises a UserWarning. If 'make', amends its parent and creates it alongside its missing parents if missing and creates an empty file. If
+        'make-parent', amends its parent and creates it alongside its missing parents if missing. Ignores if `file` doesn't exist by default.
+    category_mismatch_action : Literal['error', 'warning']
+        What to do if `file` isn't an actual file. If 'error', raises ValueError. If
+        'warning', raises UserWarning. Ignores if `directory` is something else by
+        default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    pathlib.Path
+        The amended file.
+
+    Raises
+    ------
+    OSError
+        When any of the following applies:
+        - `file` doesn't exist and `not_existing_action` is 'error'
+        - `file` doesn't exist, `not_existing_action` is 'make' and file creation fails
+
+    TypeError
+        When any of the following applies:
+        - `file` isn't a pathlib.Path and `type_mismatch_action` is 'error'
+        - `file` is None, `str(file)` throws an Exception or `pathlib.Path(file)`
+        throws an Exception and `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None or a pathlib.Path
+        - `not_existing_action` isn't None, 'error', 'warning', 'make', or 'make-parent'
+        - `category_mismatch_action` isn't None, 'error', or 'warning'
+        - `file` exists but isn't a file and `category_mismatch_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `directory` isn't a pathlib.Path and `type_mismatch_action` is 'warning'
+        - `directory` doesn't exist and `not_existing_action` is 'warning'
+        - `directory` isn't an actual directory and `category_mismatch_action` is
+        'warning'
+    """
     if type_mismatch_action not in (
         None,
         "error",

@@ -65,6 +65,70 @@ def _amend_temporal_value(
     datetime.time,
     datetime.timedelta,
 ]:
+    """Amend a temporal value.
+
+    Parameters
+    ----------
+    temporal_value_type : Union[Type[datetime.date], Type[datetime.datetime], Type
+    [datetime.time], Type[datetime.timedelta]]
+        Type of the temporal value; either a datetime.date, datetime.datetime,
+        datetime.time or datetime.timedelta.
+    temporal_value
+        Something that should in essence be a temporal value.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `temporal_value` isn't an int. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : Union[datetime.date, datetime.datetime, datetime.time,
+    datetime.timedelta]
+        Value to set `temporal_value` to if
+        `temporal_value_type(**vars(temporal_value))` throws an Exception. By default,
+        raises a TypeError.
+    minimum_value : Union[datetime.date, datetime.datetime, datetime.time,
+    datetime.timedelta]
+        The smallest value `temporal_value` can have. Defaults to no lower limit.
+    maximum_value : Union[datetime.date, datetime.datetime, datetime.time,
+    datetime.timedelta]
+        The largest value `temporal_value` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `temporal_value` is not between `minimum_value` and
+        `maximum_value`. If 'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp', clamps `temporal_value` between `minimum_value` and
+        `maximum_value`. Ignores value violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    Union[datetime.date, datetime.datetime, datetime.time, datetime.timedelta]
+        The amended temporal value.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `temporal_value` isn't a `temporal_value_type` and `type_mismatch_action` is
+        'error'
+        - `temporal_value_type(**vars(temporal_value))` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a `temporal_value_type`
+        - `minimum_value` isn't None and isn't a `temporal_value_type`
+        - `maximum_value` isn't None and isn't a `temporal_value_type`
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `temporal_value` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `temporal_value` isn't a `temporal_value_type` and `type_mismatch_action` is
+        'warning'
+        - `temporal_value` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     if temporal_value_type not in (
         datetime.date,
         datetime.datetime,
@@ -193,6 +257,60 @@ def amend_date(
     ] = None,
     warning_stack_level: int = None,
 ) -> datetime.date:
+    """Amend a date.
+
+    Parameters
+    ----------
+    date
+        Something that should in essence be a date.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `date` isn't a `datetime.date`. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : datetime.date
+        Value to set `date` to if `datetime.date(**vars(date))` throws an Exception. By
+        default, raises a TypeError.
+    minimum_value : datetime.date
+        The smallest value `date` can have. Defaults to no lower limit.
+    maximum_value : datetime.date
+        The largest value `date` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `date` is not between `minimum_value` and `maximum_value`. If
+        'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp', clamps `date` between `minimum_value` and `maximum_value`. Ignores value
+        violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    datetime.date
+        The amended date.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `date` isn't a datetime.date and `type_mismatch_action` is 'error'
+        - `datetime.date(**vars(date))` throws an Exception and `value_on_cast_error`
+        is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a datetime.date
+        - `minimum_value` isn't None and isn't a datetime.date
+        - `maximum_value` isn't None and isn't a datetime.date
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `date` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `date` isn't a datetime.date and `type_mismatch_action` is 'warning'
+        - `date` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -229,6 +347,62 @@ def amend_date_and_time(
     ] = None,
     warning_stack_level: int = None,
 ) -> datetime.datetime:
+    """Amend date-and-time.
+
+    Parameters
+    ----------
+    date_and_time
+        Something that should in essence be a date-and-time.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `date_and_time` isn't a `datetime.datetime`. If 'error', raises a TypeError. If 'warning', raises a UserWarning. Ignores type mismatches by
+        default.
+    value_on_cast_error : datetime.datetime
+        Value to set `date_and_time` to if `datetime.datetime(**vars(date))` throws an
+        Exception. By default, raises a TypeError.
+    minimum_value : datetime.datetime
+        The smallest value `date_and_time` can have. Defaults to no lower limit.
+    maximum_value : datetime.datetime
+        The largest value `date_and_time` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `date_and_time` is not between `minimum_value` and
+        `maximum_value`. If 'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp', clamps `date` between `minimum_value` and
+        `maximum_value`. Ignores value violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    datetime.datetime
+        The amended date-and-time.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `date_and_time` isn't a datetime.datetime and `type_mismatch_action` is
+        'error'
+        - `datetime.datetime(**vars(date))` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a datetime.datetime
+        - `minimum_value` isn't None and isn't a datetime.datetime
+        - `maximum_value` isn't None and isn't a datetime.datetime
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `date_and_time` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `date_and_time` isn't a datetime.datetime and `type_mismatch_action` is
+        'warning'
+        - `date_and_time` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -265,6 +439,60 @@ def amend_time(
     ] = None,
     warning_stack_level: int = None,
 ) -> datetime.time:
+    """Amend time.
+
+    Parameters
+    ----------
+    time
+        Something that should in essence be time.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `time` isn't a `datetime.time`. If 'error', raises a TypeError. If
+        'warning', raises a UserWarning. Ignores type mismatches by default.
+    value_on_cast_error : datetime.date
+        Value to set `time` to if `datetime.time(**vars(time))` throws an Exception. By
+        default, raises a TypeError.
+    minimum_value : datetime.time
+        The smallest value `time` can have. Defaults to no lower limit.
+    maximum_value : datetime.date
+        The largest value `time` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `time` is not between `minimum_value` and `maximum_value`. If
+        'error', raises a ValueError. If 'warning', raises a UserWarning. If 'clamp', clamps `time` between `minimum_value` and `maximum_value`. Ignores value
+        violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    datetime.time
+        The amended time.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `time` isn't a datetime.time and `type_mismatch_action` is 'error'
+        - `datetime.time(**vars(time))` throws an Exception and `value_on_cast_error`
+        is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a datetime.time
+        - `minimum_value` isn't None and isn't a datetime.time
+        - `maximum_value` isn't None and isn't a datetime.time
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `time` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `time` isn't a datetime.time and `type_mismatch_action` is 'warning'
+        - `time` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
@@ -301,6 +529,65 @@ def amend_temporal_offset(
     ] = None,
     warning_stack_level: int = None,
 ) -> datetime.timedelta:
+    """Amend a temporal offset.
+
+    Parameters
+    ----------
+    temporal_offset
+        Something that should in essence be a temporal offset.
+    type_mismatch_action : Literal['error', 'warning']
+        What to do if `temporal_offset` isn't a `datetime.timedelta`. If 'error',
+        raises a TypeError. If 'warning', raises a UserWarning. Ignores type mismatches
+        by default.
+    value_on_cast_error : datetime.timedelta
+        Value to set `temporal_offset` to if
+        `datetime.timedelta(**vars(temporal_offset))` throws an Exception. By default,
+        raises a TypeError.
+    minimum_value : datetime.timedelta
+        The smallest value `temporal_offset` can have. Defaults to no lower limit.
+    maximum_value : datetime.timedelta
+        The largest value `temporal_offset` can have. Defaults to no upper limit.
+    value_violation_action: Literal['error', 'warning', 'clamp']
+        What to do if `temporal_offset` is not between `minimum_value` and
+        `maximum_value`. If 'error', raises a ValueError. If 'warning', raises a
+        UserWarning. If 'clamp', clamps `temporal_offset` between `minimum_value` and
+        `maximum_value`. Ignores value violations by default.
+    warning_stack_level : int
+        Stack level which to report for warnings. Defaults to 2 (whatever called this).
+
+    Returns
+    -------
+    datetime.timedelta
+        The amended temporal offset.
+
+    Raises
+    ------
+    TypeError
+        When any of the following applies:
+        - `temporal_offset` isn't a datetime.timedelta and `type_mismatch_action` is
+        'error'
+        - `datetime.timedelta(**vars(temporal_offset))` throws an Exception and
+        `value_on_cast_error` is None
+
+    ValueError
+        When any of the following applies:
+        - `type_mismatch_action` is not None, 'error' or 'warning'
+        - `value_on_cast_error` isn't None and isn't a datetime.timedelta
+        - `minimum_value` isn't None and isn't a datetime.timedelta
+        - `maximum_value` isn't None and isn't a datetime.timedelta
+        - `value_violation_action` isn't None, 'error', 'warning' or 'clamp'
+        - `temporal_offset` isn't between `minimum_value` and `maximum_value` and
+        `value_violation_action` is 'error'
+
+    Warns
+    -----
+    UserWarning
+        When any of the following applies:
+        - `temporal_offset` isn't a datetime.timedelta and `type_mismatch_action` is
+        'warning'
+        - `temporal_offset` isn't between `minimum_length` and `maximum_length` and
+        `value_violation_action` is 'warning'
+    """
     warning_stack_level = amend_integer(
         integer=warning_stack_level,
         value_on_cast_error=2,
